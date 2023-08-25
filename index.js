@@ -9,7 +9,11 @@ const config = require('./config').read();
 
 const _module = {
 
-    tabKeys: [],
+    keys: {
+        list: [],
+        first: '',
+        second: ''
+    },
 
     init: () => {
         if (!config.tabOrder || !config.folderPath) {
@@ -18,7 +22,9 @@ const _module = {
         } else {
             console.log(`Reading files from: ${config.folderPath}`);
             console.log(`Reordering tabs to: ${config.tabOrder}`);
-            _module.tabKeys = config.tabOrder.replace(/ /g, '').split(',')
+            _module.keys.list = config.tabOrder.replace(/ /g, '').split(',');
+            _module.keys.first = _module.keys.list[0];
+            _module.keys.second = _module.keys.list[1];
         }
     },
 
@@ -53,7 +59,7 @@ const _module = {
                     let tabContents = allTabs.split(/#+ \[.*\]\(#tab\/.*\)/).filter(Boolean); // <-- removes empty elements
                     
                     const tabContent = {};
-                    const tabKeys = _module.tabKeys;
+                    const tabKeys = _module.keys.list;
 
                     tabDelimiters.forEach((delimiter, i) => {
 
