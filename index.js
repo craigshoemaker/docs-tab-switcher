@@ -7,6 +7,8 @@ const writeFile = promisify(fs.writeFile);
 
 const config = require('./config').read();
 
+const UTF8_ENCODING = 'utf8';
+
 const _module = {
 
     keys: {
@@ -30,7 +32,7 @@ const _module = {
 
     getAllFilesInFolder: async (folderPath) => await readdir(folderPath),
 
-    readFile: async (filePath) => await readFile(filePath, 'utf8'),
+    readFile: async (filePath) => await readFile(filePath, UTF8_ENCODING),
 
     filterToOnlyMarkdownFiles: (files) => files.filter(file => path.extname(file) === '.md'),
 
@@ -47,7 +49,8 @@ const _module = {
                 
                 let content = await _module.readFile(filePath);
 
-                const tabSets = content.match(/#+ \[.*\]\(#tab\/.*\)([\s\S]*?)---/gm);
+                const tabSetsPattern = new RegExp(`#+ \\[.*\\]\\(#tab/${_module.keys.second}\\)(\[\\s\\S\]*?)---`, 'gm');
+                const tabSets = content.match(tabSetsPattern);
                 tabSets.forEach(tabSection => {
 
                     // Remove ending delimiter just so we're only working
@@ -86,10 +89,13 @@ const _module = {
 
                     reorderedTabs.push('---');
 
-                    content = content.replace(tabSection, reorderedTabs.join(''));
+                    let updatedTabs = reorderedTabs.join('');
+                    updatedTabs = updatedTabs.replace(/\s*[\r\n]/gm, '\r\n'); // strip extra line breaks
 
-                    writeFile(filePath, content, 'utf-8');
+                    content = content.replace(tabSection, updatedTabs);
                 });
+
+                writeFile(filePath, content, UTF8_ENCODING);
             }
 
         } catch (error) {
