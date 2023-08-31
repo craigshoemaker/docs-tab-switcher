@@ -90,12 +90,14 @@ const _module = {
                     reorderedTabs.push('---');
 
                     let updatedTabs = reorderedTabs.join('');
-                    updatedTabs = updatedTabs.replace(/\s*[\r\n]/gm, '\r\n'); // strip extra line breaks
+                    updatedTabs = updatedTabs.replace(/\s*[\r\n]/gm, '\r\n\r\n'); // strip extra line breaks
 
                     content = content.replace(tabSection, updatedTabs);
                 });
 
-                writeFile(filePath, content, UTF8_ENCODING);
+                await writeFile(filePath, content, UTF8_ENCODING);
+
+                console.log(`Updated: ${filePath}`);
             }
 
         } catch (error) {
