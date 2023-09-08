@@ -51,49 +51,52 @@ const _module = {
 
                 const tabSetsPattern = new RegExp(`#+ \\[.*\\]\\(#tab/${_module.keys.second}\\)(\[\\s\\S\]*?)---`, 'gm');
                 const tabSets = content.match(tabSetsPattern);
-                tabSets.forEach(tabSection => {
 
-                    // Remove ending delimiter just so we're only working
-                    // with the tab content exclusively. We'll add it back 
-                    // in later.
-                    let allTabs = tabSection.replace('---', '');
+                if(tabSets && Array.isArray(tabSets)) {
 
-                    const tabDelimiters = allTabs.match(/#+ \[.*\]\(#tab\/.*\)/g);
-                    let tabContents = allTabs.split(/#+ \[.*\]\(#tab\/.*\)/).filter(Boolean); // <-- removes empty elements
-                    
-                    const tabContent = {};
-                    const tabKeys = _module.keys.list;
+                    tabSets.forEach(tabSection => {
 
-                    tabDelimiters.forEach((delimiter, i) => {
+                        // Remove ending delimiter just so we're only working
+                        // with the tab content exclusively. We'll add it back 
+                        // in later.
+                        let allTabs = tabSection.replace('---', '');
 
-                        let key = null;
-                        for(let x = 0; x < tabKeys.length; x++) {
-                            if(delimiter.match(new RegExp(`${tabKeys[x]}`))){ // find the delimiter that matches the key defined in the config file
-                                key = tabKeys[x];
-                                break;
+                        const tabDelimiters = allTabs.match(/#+ \[.*\]\(#tab\/.*\)/g);
+                        let tabContents = allTabs.split(/#+ \[.*\]\(#tab\/.*\)/).filter(Boolean); // <-- removes empty elements
+                        
+                        const tabContent = {};
+                        const tabKeys = _module.keys.list;
+
+                        tabDelimiters.forEach((delimiter, i) => {
+
+                            let key = null;
+                            for(let x = 0; x < tabKeys.length; x++) {
+                                if(delimiter.match(new RegExp(`${tabKeys[x]}`))){ // find the delimiter that matches the key defined in the config file
+                                    key = tabKeys[x];
+                                    break;
+                                }
                             }
-                        }
 
-                        if(key) {
-                            tabContent[key] = `${delimiter}\n\n${tabContents[i]}`;
-                        } else {
-                            throw new Error(`Can't match tabs in the configuration file with what's in the article.`);
-                        }
+                            if(key) {
+                                tabContent[key] = `${delimiter}\n\n${tabContents[i]}`;
+                            }
+                        });
+
+                        let reorderedTabs = [];
+
+                        tabKeys.forEach(key => {
+                            reorderedTabs.push(tabContent[key]);
+                        });
+
+                        reorderedTabs.push('---');
+
+                        let updatedTabs = reorderedTabs.join('');
+                        updatedTabs = updatedTabs.replace(/\s*[\r\n]/gm, '\r\n\r\n'); // strip extra line breaks
+
+                        content = content.replace(tabSection, updatedTabs);
                     });
 
-                    let reorderedTabs = [];
-
-                    tabKeys.forEach(key => {
-                        reorderedTabs.push(tabContent[key]);
-                    });
-
-                    reorderedTabs.push('---');
-
-                    let updatedTabs = reorderedTabs.join('');
-                    updatedTabs = updatedTabs.replace(/\s*[\r\n]/gm, '\r\n\r\n'); // strip extra line breaks
-
-                    content = content.replace(tabSection, updatedTabs);
-                });
+                }
 
                 await writeFile(filePath, content, UTF8_ENCODING);
 
