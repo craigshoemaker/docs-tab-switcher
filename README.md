@@ -4,6 +4,8 @@ Need to switch the order of conceptual tabs in a Microsoft Docs article?
 
 The Docs Tab Switcher scans a folder for Markdown files and reorders tab groups into your desired order.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/LNglYMhmboo?si=p-FLeRK3YfIQs8YY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 ## Usage
 
 First, edit the *config.json* file and update the following properties:
