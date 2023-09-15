@@ -54,6 +54,8 @@ const _module = {
 
                 if(tabSets && Array.isArray(tabSets)) {
 
+                    console.log(`Working on: ${file}`);
+
                     tabSets.forEach(tabSection => {
 
                         // Remove ending delimiter just so we're only working
@@ -91,7 +93,7 @@ const _module = {
                         reorderedTabs.push('---');
 
                         let updatedTabs = reorderedTabs.join('');
-                        updatedTabs = updatedTabs.replace(/\s*[\r\n]/gm, '\r\n\r\n'); // strip extra line breaks
+                        updatedTabs = updatedTabs.replace(/\s*(\n\n)/gm, ''); // strip extra line breaks
 
                         content = content.replace(tabSection, updatedTabs);
                     });
@@ -100,7 +102,7 @@ const _module = {
 
                 await writeFile(filePath, content, UTF8_ENCODING);
 
-                console.log(`Updated: ${filePath}`);
+                console.log(`Processed: ${filePath}`);
             }
 
         } catch (error) {
