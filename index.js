@@ -49,7 +49,7 @@ const _module = {
                 
                 let content = await _module.readFile(filePath);
 
-                const tabSetsPattern = new RegExp(`#+ \\[.*\\]\\(#tab/${_module.keys.second}\\)(\[\\s\\S\]*?)---`, 'gm');
+                const tabSetsPattern = new RegExp(`(?<=\\n)\\#+ \\[.*\\]\\(#tab/${_module.keys.second}\\)(\[\\s\\S\]*?)\\n---`, 'gm');
                 const tabSets = content.match(tabSetsPattern);
 
                 if(tabSets && Array.isArray(tabSets)) {
@@ -61,7 +61,7 @@ const _module = {
                         // Remove ending delimiter just so we're only working
                         // with the tab content exclusively. We'll add it back 
                         // in later.
-                        let allTabs = tabSection.replace('---', '');
+                        let allTabs = tabSection.replace(/(?<=\n)---/, '');
 
                         const tabDelimiters = allTabs.match(/#+ \[.*\]\(#tab\/.*\)/g);
                         let tabContents = allTabs.split(/#+ \[.*\]\(#tab\/.*\)/).filter(Boolean); // <-- removes empty elements
@@ -80,7 +80,7 @@ const _module = {
                             }
 
                             if(key) {
-                                tabContent[key] = `${delimiter}\n\n${tabContents[i]}`;
+                                tabContent[key] = `${delimiter}\%\%${tabContents[i]}`;
                             }
                         });
 
@@ -93,7 +93,7 @@ const _module = {
                         reorderedTabs.push('---');
 
                         let updatedTabs = reorderedTabs.join('');
-                        updatedTabs = updatedTabs.replace(/\s*(\n\n)/gm, ''); // strip extra line breaks
+                        updatedTabs = updatedTabs.replace(/\s*(\%\%)/gm, ''); // strip extra line breaks
 
                         content = content.replace(tabSection, updatedTabs);
                     });
